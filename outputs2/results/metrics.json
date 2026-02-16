@@ -1,0 +1,307 @@
+{
+  "inputs": {
+    "reference_path": "data/sample3.png",
+    "target_path": "data/sample4.png"
+  },
+  "registration": {
+    "method": "orb",
+    "transform_name": "affine",
+    "reference_keypoints": 5738,
+    "target_keypoints": 5763,
+    "raw_good_matches": 200,
+    "inlier_matches": 183,
+    "inlier_ratio": 0.915,
+    "fallback_used": false,
+    "registration_reliable": true,
+    "min_inlier_matches_required": 12,
+    "min_inlier_ratio_required": 0.25,
+    "min_overlap_ratio_required": 0.45,
+    "plausible_transform": true,
+    "overlap_ratio": 0.9903034216886332,
+    "clahe_enabled": true,
+    "alignment_mae": 26.73463566892692,
+    "support_mask_coverage": 1.0
+  },
+  "registration_candidates": [
+    {
+      "method": "orb",
+      "transform_name": "affine",
+      "reference_keypoints": 5738,
+      "target_keypoints": 5763,
+      "raw_good_matches": 200,
+      "inlier_matches": 183,
+      "inlier_ratio": 0.915,
+      "fallback_used": false,
+      "registration_reliable": true,
+      "min_inlier_matches_required": 12,
+      "min_inlier_ratio_required": 0.25,
+      "min_overlap_ratio_required": 0.45,
+      "plausible_transform": true,
+      "overlap_ratio": 0.9903034216886332,
+      "clahe_enabled": true,
+      "alignment_mae": 26.73463566892692,
+      "support_mask_coverage": 1.0
+    },
+    {
+      "method": "akaze",
+      "transform_name": "homography",
+      "reference_keypoints": 2284,
+      "target_keypoints": 2497,
+      "raw_good_matches": 194,
+      "inlier_matches": 180,
+      "inlier_ratio": 0.9278350515463918,
+      "fallback_used": false,
+      "registration_reliable": true,
+      "min_inlier_matches_required": 12,
+      "min_inlier_ratio_required": 0.25,
+      "min_overlap_ratio_required": 0.45,
+      "plausible_transform": true,
+      "overlap_ratio": 0.988204616393186,
+      "clahe_enabled": true,
+      "alignment_mae": 26.526834375397502,
+      "support_mask_coverage": 1.0
+    },
+    {
+      "method": "sift",
+      "transform_name": "affine",
+      "reference_keypoints": 4846,
+      "target_keypoints": 4917,
+      "raw_good_matches": 152,
+      "inlier_matches": 136,
+      "inlier_ratio": 0.8947368421052632,
+      "fallback_used": false,
+      "registration_reliable": true,
+      "min_inlier_matches_required": 12,
+      "min_inlier_ratio_required": 0.25,
+      "min_overlap_ratio_required": 0.45,
+      "plausible_transform": true,
+      "overlap_ratio": 0.9860813494975588,
+      "clahe_enabled": true,
+      "alignment_mae": 26.393758378098063,
+      "support_mask_coverage": 1.0
+    }
+  ],
+  "registration_errors": {},
+  "segmentation": {
+    "enabled_applied": true,
+    "model_name": "nvidia/segformer-b2-finetuned-ade-512-512",
+    "model_resolved_name": "C:\\Users\\gutma\\.cache\\huggingface\\hub\\models--nvidia--segformer-b2-finetuned-ade-512-512\\snapshots\\de01bae28967510f9ddd496c60a969357195400c",
+    "load_source": "hf_cache_snapshot",
+    "local_files_only": false,
+    "selected_class_ids": [
+      1,
+      4,
+      6,
+      21,
+      25,
+      61,
+      84
+    ],
+    "selected_classes": {
+      "1": "building",
+      "4": "tree",
+      "6": "road",
+      "21": "water",
+      "25": "house",
+      "61": "bridge",
+      "84": "tower"
+    }
+  },
+  "changes": {
+    "effective_pixel_diff_threshold": 47,
+    "initial_changed_pixels": 24005,
+    "gated_changed_pixels": 14936,
+    "semantic_kept_fraction": 0.6222037075609248,
+    "semantic_gate_used": true,
+    "support_pixels": 204402,
+    "support_fraction": 1.0,
+    "changed_pixels": 7435,
+    "added_pixels": 7435,
+    "removed_pixels": 0,
+    "ambiguous_pixels": 0,
+    "num_regions": 10,
+    "num_added_regions": 10,
+    "num_removed_regions": 0
+  },
+  "regions": [
+    {
+      "type": "added",
+      "bbox_xywh": [
+        77,
+        178,
+        23,
+        24
+      ],
+      "area": 222,
+      "added_pixels": 222,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        87,
+        199,
+        39,
+        20
+      ],
+      "area": 331,
+      "added_pixels": 331,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        150,
+        208,
+        28,
+        27
+      ],
+      "area": 336,
+      "added_pixels": 336,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        234,
+        210,
+        31,
+        31
+      ],
+      "area": 371,
+      "added_pixels": 371,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        93,
+        219,
+        32,
+        20
+      ],
+      "area": 218,
+      "added_pixels": 218,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        310,
+        225,
+        54,
+        53
+      ],
+      "area": 1256,
+      "added_pixels": 1256,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        33,
+        237,
+        26,
+        22
+      ],
+      "area": 311,
+      "added_pixels": 311,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        186,
+        242,
+        118,
+        74
+      ],
+      "area": 3140,
+      "added_pixels": 3140,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        44,
+        272,
+        50,
+        44
+      ],
+      "area": 964,
+      "added_pixels": 964,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        541,
+        321,
+        86,
+        5
+      ],
+      "area": 286,
+      "added_pixels": 286,
+      "removed_pixels": 0
+    }
+  ],
+  "config": {
+    "registration": {
+      "method": "auto",
+      "methods_to_try": [
+        "orb",
+        "akaze",
+        "sift"
+      ],
+      "ratio_test": 0.75,
+      "ransac_reproj_threshold": 4.0,
+      "max_features": 6000,
+      "min_inlier_matches": 12,
+      "min_inlier_ratio": 0.25,
+      "min_overlap_ratio": 0.45,
+      "allow_identity_fallback": true,
+      "fallback_improvement_margin": 1.5,
+      "fail_on_unreliable": true,
+      "use_clahe": true,
+      "clahe_clip_limit": 2.0,
+      "clahe_tile_grid_size": 8
+    },
+    "segmentation": {
+      "enabled": true,
+      "model_name": "nvidia/segformer-b2-finetuned-ade-512-512",
+      "device": "auto",
+      "local_files_only": false,
+      "classes_of_interest": [
+        "building",
+        "road",
+        "house",
+        "tree",
+        "bridge",
+        "tower",
+        "water"
+      ],
+      "confidence_threshold": 0.45
+    },
+    "change": {
+      "pixel_diff_threshold": 30,
+      "adaptive_threshold": true,
+      "threshold_percentile": 88.0,
+      "max_pixel_diff_threshold": 90,
+      "blur_kernel": 5,
+      "min_region_area": 180,
+      "intensity_margin": 8,
+      "semantic_min_kept_fraction": 0.05,
+      "use_registration_support_mask": true
+    },
+    "visualization": {
+      "overlay_alpha": 0.45,
+      "save_panel": true,
+      "panel_cell_width": 520
+    }
+  },
+  "outputs": {
+    "summary_panel": "outputs\\results\\00_summary_panel.png",
+    "overlay": "outputs\\results\\08_overlay.png",
+    "regions": "outputs\\results\\09_regions.png"
+  }
+}
