@@ -1,272 +1,255 @@
 {
   "inputs": {
-    "reference_path": "data/sample5.png",
-    "target_path": "data/sample6.png"
+    "reference_path": "data/sample11.png",
+    "target_path": "data/sample12.png"
   },
   "registration": {
-    "method": "sift",
+    "method": "orb",
     "transform_name": "homography",
-    "reference_keypoints": 4408,
-    "target_keypoints": 3305,
-    "raw_good_matches": 42,
-    "inlier_matches": 13,
-    "inlier_ratio": 0.30952380952380953,
+    "reference_keypoints": 5984,
+    "target_keypoints": 6000,
+    "raw_good_matches": 58,
+    "inlier_matches": 27,
+    "inlier_ratio": 0.46551724137931033,
     "fallback_used": false,
     "registration_reliable": true,
-    "min_inlier_matches_required": 12,
-    "min_inlier_ratio_required": 0.25,
-    "min_overlap_ratio_required": 0.45,
+    "strict_reliable": true,
+    "relaxed_near_identity_reliable": false,
     "plausible_transform": true,
-    "overlap_ratio": 0.9904496926560984,
+    "overlap_ratio": 0.7371013471572131,
     "clahe_enabled": true,
-    "alignment_mae": 26.51354577806535,
+    "alignment_mae": 54.982022245709395,
+    "identity_alignment_mae": 43.696854396295734,
+    "mae_improvement_vs_identity": -11.28516784941366,
     "support_mask_coverage": 1.0
   },
   "registration_candidates": [
     {
       "method": "orb",
       "transform_name": "homography",
-      "reference_keypoints": 5646,
-      "target_keypoints": 5731,
-      "raw_good_matches": 43,
-      "inlier_matches": 12,
-      "inlier_ratio": 0.27906976744186046,
+      "reference_keypoints": 5984,
+      "target_keypoints": 6000,
+      "raw_good_matches": 58,
+      "inlier_matches": 27,
+      "inlier_ratio": 0.46551724137931033,
       "fallback_used": false,
       "registration_reliable": true,
-      "min_inlier_matches_required": 12,
-      "min_inlier_ratio_required": 0.25,
-      "min_overlap_ratio_required": 0.45,
+      "strict_reliable": true,
+      "relaxed_near_identity_reliable": false,
       "plausible_transform": true,
-      "overlap_ratio": 0.9050404399870592,
+      "overlap_ratio": 0.7371013471572131,
       "clahe_enabled": true,
-      "alignment_mae": 39.217195082497575,
+      "alignment_mae": 54.982022245709395,
+      "identity_alignment_mae": 43.696854396295734,
+      "mae_improvement_vs_identity": -11.28516784941366,
       "support_mask_coverage": 1.0
     },
     {
       "method": "akaze",
-      "transform_name": "identity",
-      "reference_keypoints": 1290,
-      "target_keypoints": 1428,
-      "raw_good_matches": 12,
-      "inlier_matches": 0,
-      "inlier_ratio": 0.0,
-      "fallback_used": true,
-      "registration_reliable": false,
-      "min_inlier_matches_required": 12,
-      "min_inlier_ratio_required": 0.25,
-      "min_overlap_ratio_required": 0.45,
+      "transform_name": "homography",
+      "reference_keypoints": 2303,
+      "target_keypoints": 3152,
+      "raw_good_matches": 40,
+      "inlier_matches": 18,
+      "inlier_ratio": 0.45,
+      "fallback_used": false,
+      "registration_reliable": true,
+      "strict_reliable": true,
+      "relaxed_near_identity_reliable": false,
       "plausible_transform": true,
-      "overlap_ratio": 1.0,
+      "overlap_ratio": 0.943191235928666,
       "clahe_enabled": true,
-      "alignment_mae": 26.327263021675833,
-      "support_mask_coverage": 0.617693303138143
+      "alignment_mae": 39.6504974247991,
+      "identity_alignment_mae": 43.696854396295734,
+      "mae_improvement_vs_identity": 4.046356971496635,
+      "support_mask_coverage": 1.0
     },
     {
       "method": "sift",
-      "transform_name": "homography",
-      "reference_keypoints": 4408,
-      "target_keypoints": 3305,
-      "raw_good_matches": 42,
-      "inlier_matches": 13,
-      "inlier_ratio": 0.30952380952380953,
+      "transform_name": "affine",
+      "reference_keypoints": 4622,
+      "target_keypoints": 5829,
+      "raw_good_matches": 50,
+      "inlier_matches": 10,
+      "inlier_ratio": 0.2,
       "fallback_used": false,
       "registration_reliable": true,
-      "min_inlier_matches_required": 12,
-      "min_inlier_ratio_required": 0.25,
-      "min_overlap_ratio_required": 0.45,
+      "strict_reliable": false,
+      "relaxed_near_identity_reliable": true,
       "plausible_transform": true,
-      "overlap_ratio": 0.9904496926560984,
+      "overlap_ratio": 0.9381180062744309,
       "clahe_enabled": true,
-      "alignment_mae": 26.51354577806535,
+      "alignment_mae": 40.179797674769745,
+      "identity_alignment_mae": 43.696854396295734,
+      "mae_improvement_vs_identity": 3.5170567215259894,
       "support_mask_coverage": 1.0
     }
   ],
   "registration_errors": {},
   "segmentation": {
-    "enabled_applied": true,
-    "model_name": "nvidia/segformer-b2-finetuned-ade-512-512",
-    "model_resolved_name": "C:\\Users\\gutma\\.cache\\huggingface\\hub\\models--nvidia--segformer-b2-finetuned-ade-512-512\\snapshots\\de01bae28967510f9ddd496c60a969357195400c",
+    "model_name": "wu-pr-gw/segformer-b2-finetuned-with-LoveDA",
+    "model_resolved_name": "C:\\Users\\matas.g\\.cache\\huggingface\\hub\\models--wu-pr-gw--segformer-b2-finetuned-with-LoveDA\\snapshots\\5c74556c08bebb5f45f50b6f78f61a62c5d220c7",
     "load_source": "hf_cache_snapshot",
+    "processor_kind": "SegformerImageProcessor",
     "local_files_only": false,
     "selected_class_ids": [
-      1,
-      4,
-      6,
-      21,
-      25,
-      61,
-      84
+      2,
+      3
     ],
     "selected_classes": {
-      "1": "building",
-      "4": "tree",
-      "6": "road",
-      "21": "water",
-      "25": "house",
-      "61": "bridge",
-      "84": "tower"
+      "2": "Building",
+      "3": "Road"
     }
   },
   "changes": {
-    "effective_pixel_diff_threshold": 50,
-    "initial_changed_pixels": 36786,
-    "gated_changed_pixels": 14453,
-    "semantic_kept_fraction": 0.3928940357744794,
-    "semantic_gate_used": true,
-    "support_pixels": 309100,
+    "effective_pixel_diff_threshold": 90,
+    "effective_chroma_diff_threshold": 17.72004508972168,
+    "initial_changed_pixels": 83447,
+    "gated_changed_pixels": 13047,
+    "semantic_gate_mode": "confident_transition",
     "support_fraction": 1.0,
-    "changed_pixels": 8675,
-    "added_pixels": 8675,
-    "removed_pixels": 0,
+    "changed_pixels": 6957,
+    "added_pixels": 5363,
+    "removed_pixels": 1594,
     "ambiguous_pixels": 0,
-    "num_regions": 12,
-    "num_added_regions": 12,
-    "num_removed_regions": 0
+    "num_regions": 11,
+    "num_added_regions": 8,
+    "num_removed_regions": 3,
+    "edge_filtered_components": 0,
+    "sprawling_added_regions_dropped": 0
   },
   "regions": [
     {
-      "type": "added",
+      "type": "removed",
       "bbox_xywh": [
-        122,
-        22,
-        27,
-        41
-      ],
-      "area": 620,
-      "added_pixels": 620,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        82,
-        72,
+        399,
+        26,
         18,
-        41
+        37
       ],
-      "area": 398,
-      "added_pixels": 398,
+      "area": 383,
+      "added_pixels": 0,
+      "removed_pixels": 383
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        154,
+        128,
+        25,
+        29
+      ],
+      "area": 486,
+      "added_pixels": 486,
       "removed_pixels": 0
     },
     {
       "type": "added",
       "bbox_xywh": [
-        130,
-        81,
-        17,
-        20
+        284,
+        167,
+        25,
+        37
       ],
-      "area": 199,
-      "added_pixels": 199,
+      "area": 568,
+      "added_pixels": 568,
       "removed_pixels": 0
     },
     {
       "type": "added",
       "bbox_xywh": [
-        333,
-        91,
-        39,
-        28
-      ],
-      "area": 574,
-      "added_pixels": 574,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        473,
-        133,
-        23,
-        16
-      ],
-      "area": 267,
-      "added_pixels": 267,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        375,
-        210,
-        46,
-        39
-      ],
-      "area": 622,
-      "added_pixels": 622,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        296,
-        237,
-        59,
-        135
-      ],
-      "area": 3341,
-      "added_pixels": 3341,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        11,
-        247,
-        49,
+        355,
+        174,
+        24,
         34
       ],
-      "area": 775,
-      "added_pixels": 775,
+      "area": 414,
+      "added_pixels": 414,
       "removed_pixels": 0
     },
     {
       "type": "added",
       "bbox_xywh": [
-        378,
-        254,
-        67,
-        32
-      ],
-      "area": 979,
-      "added_pixels": 979,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        294,
-        331,
-        14,
-        28
-      ],
-      "area": 207,
-      "added_pixels": 207,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        371,
-        339,
-        23,
+        119,
+        359,
+        26,
         22
       ],
-      "area": 302,
-      "added_pixels": 302,
+      "area": 326,
+      "added_pixels": 326,
       "removed_pixels": 0
     },
     {
       "type": "added",
       "bbox_xywh": [
-        445,
-        407,
-        24,
-        36
+        166,
+        363,
+        35,
+        21
       ],
-      "area": 391,
-      "added_pixels": 391,
+      "area": 383,
+      "added_pixels": 383,
       "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        96,
+        380,
+        21,
+        23
+      ],
+      "area": 373,
+      "added_pixels": 373,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        96,
+        403,
+        56,
+        73
+      ],
+      "area": 1829,
+      "added_pixels": 1829,
+      "removed_pixels": 0
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        354,
+        409,
+        43,
+        34
+      ],
+      "area": 984,
+      "added_pixels": 984,
+      "removed_pixels": 0
+    },
+    {
+      "type": "removed",
+      "bbox_xywh": [
+        416,
+        448,
+        26,
+        33
+      ],
+      "area": 718,
+      "added_pixels": 0,
+      "removed_pixels": 718
+    },
+    {
+      "type": "removed",
+      "bbox_xywh": [
+        449,
+        470,
+        29,
+        20
+      ],
+      "area": 493,
+      "added_pixels": 0,
+      "removed_pixels": 493
     }
   ],
   "config": {
@@ -288,21 +271,19 @@
       "fail_on_unreliable": true,
       "use_clahe": true,
       "clahe_clip_limit": 2.0,
-      "clahe_tile_grid_size": 8
+      "clahe_tile_grid_size": 8,
+      "near_identity_reliability_enabled": true,
+      "near_identity_min_inlier_matches": 6,
+      "near_identity_min_mae_improvement": 1.0
     },
     "segmentation": {
       "enabled": true,
-      "model_name": "nvidia/segformer-b2-finetuned-ade-512-512",
+      "model_name": "wu-pr-gw/segformer-b2-finetuned-with-LoveDA",
       "device": "auto",
       "local_files_only": false,
       "classes_of_interest": [
         "building",
-        "road",
-        "house",
-        "tree",
-        "bridge",
-        "tower",
-        "water"
+        "road"
       ],
       "confidence_threshold": 0.45
     },
@@ -311,11 +292,23 @@
       "adaptive_threshold": true,
       "threshold_percentile": 88.0,
       "max_pixel_diff_threshold": 90,
+      "use_chroma_seed": true,
+      "chroma_threshold_percentile": 88.0,
+      "min_chroma_diff_threshold": 10.0,
+      "max_chroma_diff_threshold": 30.0,
       "blur_kernel": 5,
-      "min_region_area": 180,
+      "min_region_area": 300,
       "intensity_margin": 8,
       "semantic_min_kept_fraction": 0.05,
-      "use_registration_support_mask": true
+      "use_registration_support_mask": true,
+      "use_structural_edge_filter": true,
+      "structural_min_edge_fraction": 0.015,
+      "edge_dilate_kernel": 5,
+      "unresolved_min_chroma_delta": 6.0,
+      "allow_removed_without_semantic_transition": false,
+      "drop_sprawling_added_regions": true,
+      "sprawling_min_area": 6000,
+      "sprawling_max_fill_ratio": 0.42
     },
     "visualization": {
       "overlay_alpha": 0.45,
@@ -325,7 +318,7 @@
   },
   "outputs": {
     "summary_panel": "outputs\\results\\00_summary_panel.png",
-    "overlay": "outputs\\results\\08_overlay.png",
-    "regions": "outputs\\results\\09_regions.png"
+    "overlay": "outputs\\results\\06_overlay.png",
+    "regions": "outputs\\results\\07_regions.png"
   }
 }

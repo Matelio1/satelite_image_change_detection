@@ -27,7 +27,12 @@ class SegformerSegmenter:
 
         import torch
         from huggingface_hub import snapshot_download
-        from transformers import AutoImageProcessor, SegformerForSemanticSegmentation
+        from transformers import (
+            AutoFeatureExtractor,
+            AutoImageProcessor,
+            SegformerForSemanticSegmentation,
+            SegformerImageProcessor,
+        )
         from transformers.utils import logging as transformers_logging
 
         self._torch = torch
@@ -44,6 +49,7 @@ class SegformerSegmenter:
 
         self.resolved_model_name = ""
         self.load_source = ""
+        self.processor_kind = ""
 
         load_plan: list[tuple[str, bool, str]] = []
         model_path = Path(model_name)
@@ -73,7 +79,22 @@ class SegformerSegmenter:
         load_errors: list[str] = []
         for source, local_only, source_name in unique_plan:
             try:
-                self.processor = AutoImageProcessor.from_pretrained(source, local_files_only=local_only)
+                processor_errors: list[str] = []
+                try:
+                    self.processor = AutoImageProcessor.from_pretrained(source, local_files_only=local_only)
+                    self.processor_kind = "AutoImageProcessor"
+                    processor_errors = []
+                except Exception as processor_exc:
+                    processor_errors.append(f"AutoImageProcessor: {processor_exc}")
+                    try:
+                        self.processor = SegformerImageProcessor.from_pretrained(source, local_files_only=local_only)
+                        self.processor_kind = "SegformerImageProcessor"
+                        processor_errors = []
+                    except Exception as segformer_processor_exc:
+                        processor_errors.append(f"SegformerImageProcessor: {segformer_processor_exc}")
+                        self.processor = AutoFeatureExtractor.from_pretrained(source, local_files_only=local_only)
+                        self.processor_kind = "AutoFeatureExtractor"
+                        processor_errors = []
                 self.model = SegformerForSemanticSegmentation.from_pretrained(
                     source,
                     local_files_only=local_only,
@@ -85,10 +106,26 @@ class SegformerSegmenter:
                 self.load_source = source_name
                 break
             except Exception as exc:
-                load_errors.append(f"{source_name} ({source}, local_only={local_only}): {exc}")
+                if processor_errors:
+                    load_errors.append(
+                        f"{source_name} ({source}, local_only={local_only}): {exc} | "
+                        + " ; ".join(processor_errors)
+                    )
+                else:
+                    load_errors.append(f"{source_name} ({source}, local_only={local_only}): {exc}")
         else:
+            hint = ""
+            if any(
+                "pytorch_model.bin" in err or "model.safetensors" in err or "does not appear to have a file named" in err
+                for err in load_errors
+            ):
+                hint = (
+                    "\nHint: model weights were not found in local cache. "
+                    "If this is an online run, retry with internet enabled and consider updating "
+                    "`huggingface_hub` plus installing `hf_xet` for Xet-backed model files."
+                )
             raise RuntimeError(
-                "Unable to load segmentation model. Attempts:\n- " + "\n- ".join(load_errors)
+                "Unable to load segmentation model. Attempts:\n- " + "\n- ".join(load_errors) + hint
             )
 
     def segment(self, image_bgr: np.ndarray) -> SegmentationOutput:
@@ -134,11 +171,3 @@ def classes_to_ids(class_names: list[str], id2label: dict[int, str]) -> list[int
         if any(w == normalized or w in label_tokens for w in wanted):
             selected.append(class_id)
     return selected
-
-
-def colorize_mask(mask: np.ndarray) -> np.ndarray:
-    max_label = int(mask.max()) if mask.size > 0 else 0
-    rng = np.random.default_rng(seed=12345)
-    palette = rng.integers(40, 255, size=(max_label + 1, 3), dtype=np.uint8)
-    palette[0] = np.array([0, 0, 0], dtype=np.uint8)
-    return palette[mask]

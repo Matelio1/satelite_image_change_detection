@@ -25,7 +25,6 @@ def main() -> None:
     print(f"Registration inlier ratio: {metrics['registration']['inlier_ratio']:.3f}")
     print(f"Registration reliable: {metrics['registration']['registration_reliable']}")
     print(f"Registration transform: {metrics['registration']['transform_name']}")
-    print("Segmentation applied: True")
     print(f"Segmentation model source: {metrics['segmentation']['model_resolved_name']}")
     print(f"Changed pixels: {metrics['changes']['changed_pixels']}")
     print(f"Regions detected: {metrics['changes']['num_regions']}")

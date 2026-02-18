@@ -8,7 +8,7 @@ from .change_detection import detect_changes
 from .config import PipelineConfig
 from .io_utils import ensure_dir, load_image, save_binary_mask, save_image, save_json
 from .registration import FeatureRegistrar, RegistrationResult
-from .segmentation import SegformerSegmenter, classes_to_ids, colorize_mask
+from .segmentation import SegformerSegmenter, classes_to_ids
 from .visualization import build_summary_panel, draw_regions, overlay_changes
 
 
@@ -30,6 +30,9 @@ class ChangePipeline:
             use_clahe=self.config.registration.use_clahe,
             clahe_clip_limit=self.config.registration.clahe_clip_limit,
             clahe_tile_grid_size=self.config.registration.clahe_tile_grid_size,
+            near_identity_reliability_enabled=self.config.registration.near_identity_reliability_enabled,
+            near_identity_min_inlier_matches=self.config.registration.near_identity_min_inlier_matches,
+            near_identity_min_mae_improvement=self.config.registration.near_identity_min_mae_improvement,
         )
 
     @staticmethod
@@ -108,6 +111,7 @@ class ChangePipeline:
             class_ids = classes_to_ids(self.config.segmentation.classes_of_interest, ref_seg.id2label)
             resolved_model_name = segmenter.resolved_model_name
             segmentation_load_source = segmenter.load_source
+            segmentation_processor_kind = segmenter.processor_kind
         except Exception as exc:
             raise RuntimeError(
                 "Segmentation model is required but could not be loaded or executed. "
@@ -122,6 +126,10 @@ class ChangePipeline:
             classes_of_interest=class_ids,
             segmentation_confidence_threshold=self.config.segmentation.confidence_threshold,
             pixel_diff_threshold=self.config.change.pixel_diff_threshold,
+            use_chroma_seed=self.config.change.use_chroma_seed,
+            chroma_threshold_percentile=self.config.change.chroma_threshold_percentile,
+            min_chroma_diff_threshold=self.config.change.min_chroma_diff_threshold,
+            max_chroma_diff_threshold=self.config.change.max_chroma_diff_threshold,
             blur_kernel=self.config.change.blur_kernel,
             min_region_area=self.config.change.min_region_area,
             intensity_margin=self.config.change.intensity_margin,
@@ -130,6 +138,14 @@ class ChangePipeline:
             adaptive_threshold=self.config.change.adaptive_threshold,
             threshold_percentile=self.config.change.threshold_percentile,
             max_pixel_diff_threshold=self.config.change.max_pixel_diff_threshold,
+            use_structural_edge_filter=self.config.change.use_structural_edge_filter,
+            structural_min_edge_fraction=self.config.change.structural_min_edge_fraction,
+            edge_dilate_kernel=self.config.change.edge_dilate_kernel,
+            unresolved_min_chroma_delta=self.config.change.unresolved_min_chroma_delta,
+            allow_removed_without_semantic_transition=self.config.change.allow_removed_without_semantic_transition,
+            drop_sprawling_added_regions=self.config.change.drop_sprawling_added_regions,
+            sprawling_min_area=self.config.change.sprawling_min_area,
+            sprawling_max_fill_ratio=self.config.change.sprawling_max_fill_ratio,
         )
 
         overlay = overlay_changes(
@@ -143,13 +159,11 @@ class ChangePipeline:
 
         save_image(output_dir / "01_matches.png", reg_result.match_visualization)
         save_image(output_dir / "02_registered_target.png", reg_result.aligned_target)
-        save_image(output_dir / "03_ref_segmentation.png", colorize_mask(ref_seg.mask))
-        save_image(output_dir / "04_target_segmentation.png", colorize_mask(tgt_seg.mask))
-        save_binary_mask(output_dir / "05_change_mask.png", change_result.change_mask)
-        save_binary_mask(output_dir / "06_added_mask.png", change_result.added_mask)
-        save_binary_mask(output_dir / "07_removed_mask.png", change_result.removed_mask)
-        save_image(output_dir / "08_overlay.png", overlay)
-        save_image(output_dir / "09_regions.png", regions_img)
+        save_binary_mask(output_dir / "03_change_mask.png", change_result.change_mask)
+        save_binary_mask(output_dir / "04_added_mask.png", change_result.added_mask)
+        save_binary_mask(output_dir / "05_removed_mask.png", change_result.removed_mask)
+        save_image(output_dir / "06_overlay.png", overlay)
+        save_image(output_dir / "07_regions.png", regions_img)
 
         panel_path = None
         if self.config.visualization.save_panel:
@@ -174,10 +188,10 @@ class ChangePipeline:
             "registration_candidates": registration_candidates_stats,
             "registration_errors": registration_errors,
             "segmentation": {
-                "enabled_applied": True,
                 "model_name": self.config.segmentation.model_name,
                 "model_resolved_name": resolved_model_name,
                 "load_source": segmentation_load_source,
+                "processor_kind": segmentation_processor_kind,
                 "local_files_only": self.config.segmentation.local_files_only,
                 "selected_class_ids": class_ids,
                 "selected_classes": {str(cid): ref_seg.id2label[cid] for cid in class_ids},
@@ -187,8 +201,8 @@ class ChangePipeline:
             "config": asdict(self.config),
             "outputs": {
                 "summary_panel": str(panel_path) if panel_path else None,
-                "overlay": str(output_dir / "08_overlay.png"),
-                "regions": str(output_dir / "09_regions.png"),
+                "overlay": str(output_dir / "06_overlay.png"),
+                "regions": str(output_dir / "07_regions.png"),
             },
         }
         save_json(output_dir / "metrics.json", metrics)
