@@ -44,6 +44,11 @@ def _extract_regions(
     added_mask: np.ndarray,
     removed_mask: np.ndarray,
     min_region_area: int,
+    edge_support: np.ndarray | None = None,
+    semantic_transition: np.ndarray | None = None,
+    diff_gray: np.ndarray | None = None,
+    ref_confidence: np.ndarray | None = None,
+    tgt_confidence: np.ndarray | None = None,
 ) -> list[dict[str, Any]]:
     regions: list[dict[str, Any]] = []
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(combined_mask.astype(np.uint8), connectivity=8)
@@ -66,6 +71,20 @@ def _extract_regions(
         else:
             region_type = "ambiguous"
 
+        confidence = 0.5
+        if (
+            edge_support is not None
+            and semantic_transition is not None
+            and diff_gray is not None
+            and ref_confidence is not None
+            and tgt_confidence is not None
+        ):
+            edge_fraction = float(np.count_nonzero(edge_support & region_mask) / max(1, area))
+            semantic_fraction = float(np.count_nonzero(semantic_transition & region_mask) / max(1, area))
+            intensity_score = float(np.mean(diff_gray[region_mask]) / 255.0)
+            model_score = float(max(np.mean(ref_confidence[region_mask]), np.mean(tgt_confidence[region_mask])))
+            confidence = float(np.clip(0.35 * edge_fraction + 0.30 * semantic_fraction + 0.20 * intensity_score + 0.15 * model_score, 0.0, 1.0))
+
         regions.append(
             {
                 "type": region_type,
@@ -73,6 +92,7 @@ def _extract_regions(
                 "area": area,
                 "added_pixels": added_pixels,
                 "removed_pixels": removed_pixels,
+                "confidence": confidence,
             }
         )
     return regions
@@ -83,6 +103,8 @@ def _filter_by_edge_density(
     edge_support: np.ndarray,
     min_edge_fraction: float,
     min_region_area: int,
+    semantic_support: np.ndarray | None = None,
+    min_semantic_fraction: float = 0.0,
 ) -> tuple[np.ndarray, int]:
     if min_edge_fraction <= 0:
         return mask, 0
@@ -97,7 +119,12 @@ def _filter_by_edge_density(
         region = labels == label_idx
         edge_pixels = int(np.count_nonzero(edge_support & region))
         edge_fraction = float(edge_pixels / max(1, area))
-        if edge_fraction >= min_edge_fraction:
+        semantic_fraction = (
+            float(np.count_nonzero(semantic_support & region) / max(1, area))
+            if semantic_support is not None
+            else 0.0
+        )
+        if edge_fraction >= min_edge_fraction or semantic_fraction >= min_semantic_fraction:
             cleaned |= region
         else:
             removed_components += 1
@@ -137,6 +164,23 @@ def _drop_sprawling_components(
     return cleaned, dropped
 
 
+def _drop_large_components(mask: np.ndarray, max_area_fraction: float) -> tuple[np.ndarray, int]:
+    if max_area_fraction <= 0:
+        return mask, 0
+    h, w = mask.shape[:2]
+    max_area = int(max(1, h * w * max_area_fraction))
+    cleaned = np.zeros_like(mask, dtype=bool)
+    dropped = 0
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), connectivity=8)
+    for label_idx in range(1, num_labels):
+        area = int(stats[label_idx, cv2.CC_STAT_AREA])
+        if area > max_area:
+            dropped += 1
+            continue
+        cleaned[labels == label_idx] = True
+    return cleaned, dropped
+
+
 def detect_changes(
     reference_bgr: np.ndarray,
     aligned_target_bgr: np.ndarray,
@@ -161,11 +205,21 @@ def detect_changes(
     structural_min_edge_fraction: float = 0.015,
     edge_dilate_kernel: int = 5,
     unresolved_min_chroma_delta: float = 6.0,
+    rescue_semantic_kept_max: float = 0.12,
+    small_image_semantic_fallback: bool = False,
+    small_image_semantic_dilate_kernel: int = 3,
+    small_image_semantic_min_region_area: int = 40,
     allow_removed_without_semantic_transition: bool = False,
     drop_sprawling_added_regions: bool = True,
     sprawling_min_area: int = 6000,
     sprawling_max_fill_ratio: float = 0.42,
 ) -> ChangeResult:
+    h_img, w_img = reference_bgr.shape[:2]
+    region_min_area = int(min_region_area)
+    if min(h_img, w_img) <= 320:
+        area_scale = float((h_img * w_img) / float(500 * 500))
+        region_min_area = int(max(40, round(min_region_area * area_scale)))
+
     diff = cv2.absdiff(reference_bgr, aligned_target_bgr)
     diff_gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     ref_lab = cv2.cvtColor(reference_bgr, cv2.COLOR_BGR2LAB).astype(np.int16)
@@ -217,9 +271,74 @@ def detect_changes(
         ref_interest = np.ones_like(initial_change_mask, dtype=bool)
         tgt_interest = np.ones_like(initial_change_mask, dtype=bool)
 
+    if small_image_semantic_fallback:
+        dk = int(max(1, small_image_semantic_dilate_kernel))
+        if dk % 2 == 0:
+            dk += 1
+        min_area_small = int(max(10, small_image_semantic_min_region_area))
+        # For tiny unreliable pairs, do not clip by sparse support mask.
+        added_seed = (tgt_interest & (~ref_interest)).astype(np.uint8)
+        if dk > 1:
+            added_seed = cv2.dilate(
+                added_seed,
+                cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (dk, dk)),
+            )
+        if dk > 1:
+            added_seed = cv2.morphologyEx(
+                added_seed,
+                cv2.MORPH_CLOSE,
+                cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (dk, dk)),
+            )
+        added_mask = _remove_small_components(added_seed > 0, min_area_small)
+        removed_mask = np.zeros_like(added_mask, dtype=bool)
+        ambiguous_mask = np.zeros_like(added_mask, dtype=bool)
+        combined = added_mask.copy()
+        regions = _extract_regions(
+            combined,
+            added_mask,
+            removed_mask,
+            min_area_small,
+        )
+        support_fraction = float(np.count_nonzero(valid_mask_bool) / max(1, valid_mask_bool.size))
+        metrics = {
+            "mode": "small_image_semantic_fallback",
+            "effective_pixel_diff_threshold": effective_threshold,
+            "effective_chroma_diff_threshold": float(effective_chroma_threshold) if use_chroma_seed else None,
+            "initial_changed_pixels": initial_changed_pixels,
+            "gated_changed_pixels": int(np.count_nonzero(combined)),
+            "semantic_gate_mode": "small_image_semantic_fallback",
+            "support_fraction": support_fraction,
+            "changed_pixels": int(np.count_nonzero(combined)),
+            "added_pixels": int(np.count_nonzero(added_mask)),
+            "removed_pixels": 0,
+            "ambiguous_pixels": 0,
+            "num_regions": len(regions),
+            "num_added_regions": int(sum(1 for r in regions if r["type"] == "added")),
+            "num_removed_regions": 0,
+            "edge_filtered_components": 0,
+            "sprawling_added_regions_dropped": 0,
+            "rescue_large_components_dropped": 0,
+            "effective_min_region_area": int(min_area_small),
+            "pair_unreliable": True,
+        }
+        return ChangeResult(
+            change_mask=combined,
+            added_mask=added_mask,
+            removed_mask=removed_mask,
+            ambiguous_mask=ambiguous_mask,
+            regions=regions,
+            metrics=metrics,
+        )
+
     ref_gray_u8 = cv2.cvtColor(reference_bgr, cv2.COLOR_BGR2GRAY)
     tgt_gray_u8 = cv2.cvtColor(aligned_target_bgr, cv2.COLOR_BGR2GRAY)
     edge_support_for_seed = _build_edge_support(ref_gray_u8, tgt_gray_u8, edge_dilate_kernel)
+    grad_ref = cv2.magnitude(cv2.Sobel(ref_gray_u8, cv2.CV_32F, 1, 0, 3), cv2.Sobel(ref_gray_u8, cv2.CV_32F, 0, 1, 3))
+    grad_tgt = cv2.magnitude(cv2.Sobel(tgt_gray_u8, cv2.CV_32F, 1, 0, 3), cv2.Sobel(tgt_gray_u8, cv2.CV_32F, 0, 1, 3))
+    grad_delta = grad_tgt - grad_ref
+    grad_delta_abs = np.abs(grad_delta)
+    grad_values = grad_delta_abs[valid_mask_bool] if np.any(valid_mask_bool) else grad_delta_abs.reshape(-1)
+    grad_margin = float(np.clip(np.percentile(grad_values, 88) if grad_values.size > 0 else 12.0, 8.0, 24.0))
 
     ref_confident = reference_seg.confidence >= segmentation_confidence_threshold
     tgt_confident = target_seg.confidence >= segmentation_confidence_threshold
@@ -267,7 +386,59 @@ def detect_changes(
     else:
         seed_change = initial_change_mask
 
-    change_mask = _clean_mask(seed_change, blur_kernel, min_region_area)
+    # Rescue clear structural changes where segmentation misses class transitions.
+    structural_rescue = (
+        valid_mask_bool
+        & edge_support_for_seed
+        & (~semantic_gate_confident)
+        & (
+            (diff_gray > max(pixel_diff_threshold - 4, effective_threshold - 18))
+            | (chroma_delta > max(5.0, 0.65 * effective_chroma_threshold))
+            | (grad_delta_abs > max(7.0, 0.7 * grad_margin))
+        )
+    )
+    rescue_mask = np.zeros_like(structural_rescue, dtype=bool)
+    rescue_large_components_dropped = 0
+    if classes_of_interest and semantic_kept_fraction < float(rescue_semantic_kept_max):
+        structural_rescue_main = _clean_mask(structural_rescue, blur_kernel, max(60, region_min_area // 2))
+        structural_rescue_main, _ = _filter_by_edge_density(
+            structural_rescue_main,
+            edge_support_for_seed,
+            min_edge_fraction=max(0.03, structural_min_edge_fraction * 2.5),
+            min_region_area=max(60, region_min_area // 2),
+        )
+        structural_rescue_main, _ = _drop_sprawling_components(structural_rescue_main, min_area=2500, max_fill_ratio=0.55)
+
+        target_interest_dilated = cv2.dilate(
+            (tgt_interest & (~ref_interest)).astype(np.uint8),
+            cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (17, 17)),
+        ).astype(bool)
+        structural_rescue_guided = _clean_mask(
+            structural_rescue & target_interest_dilated,
+            blur_kernel,
+            max(40, region_min_area // 3),
+        )
+        structural_rescue_guided, _ = _filter_by_edge_density(
+            structural_rescue_guided,
+            edge_support_for_seed,
+            min_edge_fraction=max(0.02, structural_min_edge_fraction * 2.0),
+            min_region_area=max(40, region_min_area // 3),
+        )
+
+        structural_rescue_main, dropped_main = _drop_large_components(
+            structural_rescue_main,
+            max_area_fraction=0.25,
+        )
+        structural_rescue_guided, dropped_guided = _drop_large_components(
+            structural_rescue_guided,
+            max_area_fraction=0.15,
+        )
+        rescue_large_components_dropped = int(dropped_main + dropped_guided)
+        structural_rescue = structural_rescue_main | structural_rescue_guided
+        seed_change |= structural_rescue
+        rescue_mask = structural_rescue
+
+    change_mask = _clean_mask(seed_change, blur_kernel, region_min_area)
 
     added_mask = change_mask & tgt_interest & (~ref_interest)
     removed_mask = change_mask & ref_interest & (~tgt_interest)
@@ -277,11 +448,13 @@ def detect_changes(
     tgt_gray = tgt_gray_u8.astype(np.int16)
     delta = tgt_gray - ref_gray
 
-    added_candidates = unresolved & (delta > intensity_margin)
-    removed_candidates = unresolved & (delta < -intensity_margin)
+    added_candidates = unresolved & ((delta > intensity_margin) | (grad_delta > 0.6 * grad_margin))
+    removed_candidates = unresolved & ((delta < -intensity_margin) & (grad_delta < -0.6 * grad_margin))
     fallback_gate = (chroma_delta >= float(unresolved_min_chroma_delta)) | edge_support_for_seed
     added_candidates &= fallback_gate
     removed_candidates &= fallback_gate
+    removed_candidates &= semantic_gate_relaxed
+    added_candidates |= unresolved & rescue_mask & (~removed_candidates)
 
     if semantic_gate_mode == "edge_only" and not allow_removed_without_semantic_transition:
         removed_candidates = np.zeros_like(removed_candidates, dtype=bool)
@@ -291,9 +464,9 @@ def detect_changes(
     ambiguous_mask = unresolved & (~(delta > intensity_margin)) & (~(delta < -intensity_margin))
     ambiguous_mask |= unresolved & (~added_mask) & (~removed_mask)
 
-    added_mask = _clean_mask(added_mask, blur_kernel, min_region_area)
-    removed_mask = _clean_mask(removed_mask, blur_kernel, min_region_area)
-    ambiguous_mask = _clean_mask(ambiguous_mask, blur_kernel, min_region_area)
+    added_mask = _clean_mask(added_mask, blur_kernel, region_min_area)
+    removed_mask = _clean_mask(removed_mask, blur_kernel, region_min_area)
+    ambiguous_mask = _clean_mask(ambiguous_mask, blur_kernel, region_min_area)
 
     sprawling_added_regions_dropped = 0
     if drop_sprawling_added_regions and np.any(added_mask):
@@ -311,13 +484,35 @@ def detect_changes(
             combined,
             edge_support,
             structural_min_edge_fraction,
-            min_region_area,
+            region_min_area,
+            semantic_support=(~same_semantic_label) & interest_mask,
+            min_semantic_fraction=0.03,
         )
         added_mask &= combined
         removed_mask &= combined
         ambiguous_mask &= combined
 
-    regions = _extract_regions(combined, added_mask, removed_mask, min_region_area)
+    regions = _extract_regions(
+        combined,
+        added_mask,
+        removed_mask,
+        region_min_area,
+        edge_support=edge_support_for_seed,
+        semantic_transition=(~same_semantic_label) & interest_mask,
+        diff_gray=diff_gray,
+        ref_confidence=reference_seg.confidence,
+        tgt_confidence=target_seg.confidence,
+    )
+
+    support_fraction = float(np.count_nonzero(valid_mask_bool) / max(1, valid_mask_bool.size))
+    pair_unreliable = bool(
+        (support_fraction < 0.55)
+        or (
+            semantic_gate_mode in {"interest_only", "edge_only"}
+            and relaxed_semantic_kept_fraction < 0.12
+            and support_fraction < 0.85
+        )
+    )
 
     metrics = {
         "effective_pixel_diff_threshold": effective_threshold,
@@ -325,7 +520,7 @@ def detect_changes(
         "initial_changed_pixels": initial_changed_pixels,
         "gated_changed_pixels": gated_changed_pixels,
         "semantic_gate_mode": semantic_gate_mode,
-        "support_fraction": float(np.count_nonzero(valid_mask_bool) / max(1, valid_mask_bool.size)),
+        "support_fraction": support_fraction,
         "changed_pixels": int(np.count_nonzero(combined)),
         "added_pixels": int(np.count_nonzero(added_mask)),
         "removed_pixels": int(np.count_nonzero(removed_mask)),
@@ -335,6 +530,9 @@ def detect_changes(
         "num_removed_regions": int(sum(1 for r in regions if r["type"] == "removed")),
         "edge_filtered_components": int(edge_filtered_components),
         "sprawling_added_regions_dropped": int(sprawling_added_regions_dropped),
+        "rescue_large_components_dropped": int(rescue_large_components_dropped),
+        "effective_min_region_area": int(region_min_area),
+        "pair_unreliable": pair_unreliable,
     }
 
     return ChangeResult(

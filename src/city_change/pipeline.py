@@ -84,15 +84,23 @@ class ChangePipeline:
         registration_candidates_stats = [candidate.stats for candidate in registration_candidates]
 
         if self.config.registration.fail_on_unreliable and not reg_result.stats.get("registration_reliable", False):
-            raise RuntimeError(
-                "Registration judged unreliable. "
-                f"Selected method={reg_result.stats.get('method')}, "
-                f"transform={reg_result.stats.get('transform_name')}, "
-                f"inliers={reg_result.stats.get('inlier_matches')}, "
-                f"inlier_ratio={reg_result.stats.get('inlier_ratio'):.3f}. "
-                "Use better-aligned image pairs, or disable strict mode with "
-                "registration.fail_on_unreliable=false."
+            min_dim = min(reference.shape[0], reference.shape[1], target.shape[0], target.shape[1])
+            small_image_fallback = bool(
+                self.config.registration.allow_small_image_unreliable_fallback
+                and min_dim <= int(self.config.registration.small_image_max_dim)
             )
+            if not small_image_fallback:
+                raise RuntimeError(
+                    "Registration judged unreliable. "
+                    f"Selected method={reg_result.stats.get('method')}, "
+                    f"transform={reg_result.stats.get('transform_name')}, "
+                    f"inliers={reg_result.stats.get('inlier_matches')}, "
+                    f"inlier_ratio={reg_result.stats.get('inlier_ratio'):.3f}. "
+                    "Use better-aligned image pairs, or disable strict mode with "
+                    "registration.fail_on_unreliable=false."
+                )
+            reg_result.stats["small_image_unreliable_fallback"] = True
+            reg_result.stats["small_image_min_dim"] = int(min_dim)
 
         if not self.config.segmentation.enabled:
             raise RuntimeError(
@@ -142,6 +150,13 @@ class ChangePipeline:
             structural_min_edge_fraction=self.config.change.structural_min_edge_fraction,
             edge_dilate_kernel=self.config.change.edge_dilate_kernel,
             unresolved_min_chroma_delta=self.config.change.unresolved_min_chroma_delta,
+            rescue_semantic_kept_max=self.config.change.rescue_semantic_kept_max,
+            small_image_semantic_fallback=bool(
+                reg_result.stats.get("small_image_unreliable_fallback", False)
+                and self.config.change.small_image_semantic_fallback_enabled
+            ),
+            small_image_semantic_dilate_kernel=self.config.change.small_image_semantic_dilate_kernel,
+            small_image_semantic_min_region_area=self.config.change.small_image_semantic_min_region_area,
             allow_removed_without_semantic_transition=self.config.change.allow_removed_without_semantic_transition,
             drop_sprawling_added_regions=self.config.change.drop_sprawling_added_regions,
             sprawling_min_area=self.config.change.sprawling_min_area,
@@ -205,5 +220,9 @@ class ChangePipeline:
                 "regions": str(output_dir / "07_regions.png"),
             },
         }
+        metrics["pair_unreliable"] = bool(
+            (not reg_result.stats.get("registration_reliable", False))
+            or change_result.metrics.get("pair_unreliable", False)
+        )
         save_json(output_dir / "metrics.json", metrics)
         return metrics

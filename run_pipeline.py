@@ -28,6 +28,7 @@ def main() -> None:
     print(f"Segmentation model source: {metrics['segmentation']['model_resolved_name']}")
     print(f"Changed pixels: {metrics['changes']['changed_pixels']}")
     print(f"Regions detected: {metrics['changes']['num_regions']}")
+    print(f"Pair unreliable: {metrics['pair_unreliable']}")
     print(f"Results saved to: {app_config.run.output_dir}")
 
 

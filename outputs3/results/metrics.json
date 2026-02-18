@@ -1,94 +1,98 @@
 {
   "inputs": {
-    "reference_path": "data/sample11.png",
-    "target_path": "data/sample12.png"
+    "reference_path": "data/ref6.png",
+    "target_path": "data/targ6.png"
   },
   "registration": {
     "method": "orb",
-    "transform_name": "homography",
-    "reference_keypoints": 5984,
-    "target_keypoints": 6000,
-    "raw_good_matches": 58,
-    "inlier_matches": 27,
-    "inlier_ratio": 0.46551724137931033,
-    "fallback_used": false,
-    "registration_reliable": true,
-    "strict_reliable": true,
+    "transform_name": "identity",
+    "reference_keypoints": 3681,
+    "target_keypoints": 3156,
+    "raw_good_matches": 11,
+    "inlier_matches": 0,
+    "inlier_ratio": 0.0,
+    "fallback_used": true,
+    "registration_reliable": false,
+    "strict_reliable": false,
     "relaxed_near_identity_reliable": false,
     "plausible_transform": true,
-    "overlap_ratio": 0.7371013471572131,
+    "overlap_ratio": 1.0,
     "clahe_enabled": true,
-    "alignment_mae": 54.982022245709395,
-    "identity_alignment_mae": 43.696854396295734,
-    "mae_improvement_vs_identity": -11.28516784941366,
-    "support_mask_coverage": 1.0
+    "alignment_mae": 50.18937683105469,
+    "identity_alignment_mae": 50.18937683105469,
+    "mae_improvement_vs_identity": 0.0,
+    "support_mask_coverage": 0.280487060546875,
+    "small_image_unreliable_fallback": true,
+    "small_image_min_dim": 256
   },
   "registration_candidates": [
     {
       "method": "orb",
-      "transform_name": "homography",
-      "reference_keypoints": 5984,
-      "target_keypoints": 6000,
-      "raw_good_matches": 58,
-      "inlier_matches": 27,
-      "inlier_ratio": 0.46551724137931033,
-      "fallback_used": false,
-      "registration_reliable": true,
-      "strict_reliable": true,
+      "transform_name": "identity",
+      "reference_keypoints": 3681,
+      "target_keypoints": 3156,
+      "raw_good_matches": 11,
+      "inlier_matches": 0,
+      "inlier_ratio": 0.0,
+      "fallback_used": true,
+      "registration_reliable": false,
+      "strict_reliable": false,
       "relaxed_near_identity_reliable": false,
       "plausible_transform": true,
-      "overlap_ratio": 0.7371013471572131,
+      "overlap_ratio": 1.0,
       "clahe_enabled": true,
-      "alignment_mae": 54.982022245709395,
-      "identity_alignment_mae": 43.696854396295734,
-      "mae_improvement_vs_identity": -11.28516784941366,
-      "support_mask_coverage": 1.0
+      "alignment_mae": 50.18937683105469,
+      "identity_alignment_mae": 50.18937683105469,
+      "mae_improvement_vs_identity": 0.0,
+      "support_mask_coverage": 0.280487060546875,
+      "small_image_unreliable_fallback": true,
+      "small_image_min_dim": 256
     },
     {
       "method": "akaze",
-      "transform_name": "homography",
-      "reference_keypoints": 2303,
-      "target_keypoints": 3152,
-      "raw_good_matches": 40,
-      "inlier_matches": 18,
-      "inlier_ratio": 0.45,
-      "fallback_used": false,
-      "registration_reliable": true,
-      "strict_reliable": true,
+      "transform_name": "identity",
+      "reference_keypoints": 491,
+      "target_keypoints": 470,
+      "raw_good_matches": 2,
+      "inlier_matches": 0,
+      "inlier_ratio": 0.0,
+      "fallback_used": true,
+      "registration_reliable": false,
+      "strict_reliable": false,
       "relaxed_near_identity_reliable": false,
       "plausible_transform": true,
-      "overlap_ratio": 0.943191235928666,
+      "overlap_ratio": 1.0,
       "clahe_enabled": true,
-      "alignment_mae": 39.6504974247991,
-      "identity_alignment_mae": 43.696854396295734,
-      "mae_improvement_vs_identity": 4.046356971496635,
+      "alignment_mae": 50.18937683105469,
+      "identity_alignment_mae": 50.18937683105469,
+      "mae_improvement_vs_identity": 0.0,
       "support_mask_coverage": 1.0
     },
     {
       "method": "sift",
-      "transform_name": "affine",
-      "reference_keypoints": 4622,
-      "target_keypoints": 5829,
-      "raw_good_matches": 50,
-      "inlier_matches": 10,
-      "inlier_ratio": 0.2,
-      "fallback_used": false,
-      "registration_reliable": true,
+      "transform_name": "identity",
+      "reference_keypoints": 1695,
+      "target_keypoints": 791,
+      "raw_good_matches": 8,
+      "inlier_matches": 0,
+      "inlier_ratio": 0.0,
+      "fallback_used": true,
+      "registration_reliable": false,
       "strict_reliable": false,
-      "relaxed_near_identity_reliable": true,
+      "relaxed_near_identity_reliable": false,
       "plausible_transform": true,
-      "overlap_ratio": 0.9381180062744309,
+      "overlap_ratio": 1.0,
       "clahe_enabled": true,
-      "alignment_mae": 40.179797674769745,
-      "identity_alignment_mae": 43.696854396295734,
-      "mae_improvement_vs_identity": 3.5170567215259894,
-      "support_mask_coverage": 1.0
+      "alignment_mae": 50.18937683105469,
+      "identity_alignment_mae": 50.18937683105469,
+      "mae_improvement_vs_identity": 0.0,
+      "support_mask_coverage": 0.22698974609375
     }
   ],
   "registration_errors": {},
   "segmentation": {
     "model_name": "wu-pr-gw/segformer-b2-finetuned-with-LoveDA",
-    "model_resolved_name": "C:\\Users\\matas.g\\.cache\\huggingface\\hub\\models--wu-pr-gw--segformer-b2-finetuned-with-LoveDA\\snapshots\\5c74556c08bebb5f45f50b6f78f61a62c5d220c7",
+    "model_resolved_name": "C:\\Users\\gutma\\.cache\\huggingface\\hub\\models--wu-pr-gw--segformer-b2-finetuned-with-LoveDA\\snapshots\\5c74556c08bebb5f45f50b6f78f61a62c5d220c7",
     "load_source": "hf_cache_snapshot",
     "processor_kind": "SegformerImageProcessor",
     "local_files_only": false,
@@ -102,154 +106,195 @@
     }
   },
   "changes": {
-    "effective_pixel_diff_threshold": 90,
-    "effective_chroma_diff_threshold": 17.72004508972168,
-    "initial_changed_pixels": 83447,
-    "gated_changed_pixels": 13047,
-    "semantic_gate_mode": "confident_transition",
-    "support_fraction": 1.0,
-    "changed_pixels": 6957,
-    "added_pixels": 5363,
-    "removed_pixels": 1594,
+    "mode": "small_image_semantic_fallback",
+    "effective_pixel_diff_threshold": 68,
+    "effective_chroma_diff_threshold": 15.81138801574707,
+    "initial_changed_pixels": 3643,
+    "gated_changed_pixels": 8888,
+    "semantic_gate_mode": "small_image_semantic_fallback",
+    "support_fraction": 0.280487060546875,
+    "changed_pixels": 8888,
+    "added_pixels": 8888,
+    "removed_pixels": 0,
     "ambiguous_pixels": 0,
-    "num_regions": 11,
-    "num_added_regions": 8,
-    "num_removed_regions": 3,
+    "num_regions": 13,
+    "num_added_regions": 13,
+    "num_removed_regions": 0,
     "edge_filtered_components": 0,
-    "sprawling_added_regions_dropped": 0
+    "sprawling_added_regions_dropped": 0,
+    "rescue_large_components_dropped": 0,
+    "effective_min_region_area": 60,
+    "pair_unreliable": true
   },
   "regions": [
     {
-      "type": "removed",
+      "type": "added",
       "bbox_xywh": [
-        399,
-        26,
-        18,
-        37
+        0,
+        33,
+        13,
+        19
       ],
-      "area": 383,
-      "added_pixels": 0,
-      "removed_pixels": 383
+      "area": 205,
+      "added_pixels": 205,
+      "removed_pixels": 0,
+      "confidence": 0.5
     },
     {
       "type": "added",
       "bbox_xywh": [
-        154,
-        128,
+        197,
+        40,
         25,
-        29
+        12
       ],
-      "area": 486,
-      "added_pixels": 486,
-      "removed_pixels": 0
+      "area": 227,
+      "added_pixels": 227,
+      "removed_pixels": 0,
+      "confidence": 0.5
     },
     {
       "type": "added",
       "bbox_xywh": [
-        284,
-        167,
-        25,
-        37
-      ],
-      "area": 568,
-      "added_pixels": 568,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        355,
-        174,
+        54,
+        56,
         24,
+        32
+      ],
+      "area": 549,
+      "added_pixels": 549,
+      "removed_pixels": 0,
+      "confidence": 0.5
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        186,
+        73,
+        37,
+        26
+      ],
+      "area": 806,
+      "added_pixels": 806,
+      "removed_pixels": 0,
+      "confidence": 0.5
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        142,
+        128,
+        28,
+        40
+      ],
+      "area": 908,
+      "added_pixels": 908,
+      "removed_pixels": 0,
+      "confidence": 0.5
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        194,
+        129,
+        31,
+        39
+      ],
+      "area": 974,
+      "added_pixels": 974,
+      "removed_pixels": 0,
+      "confidence": 0.5
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        39,
+        130,
+        36,
+        36
+      ],
+      "area": 1016,
+      "added_pixels": 1016,
+      "removed_pixels": 0,
+      "confidence": 0.5
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        91,
+        131,
+        37,
+        32
+      ],
+      "area": 923,
+      "added_pixels": 923,
+      "removed_pixels": 0,
+      "confidence": 0.5
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        75,
+        217,
+        34,
+        24
+      ],
+      "area": 679,
+      "added_pixels": 679,
+      "removed_pixels": 0,
+      "confidence": 0.5
+    },
+    {
+      "type": "added",
+      "bbox_xywh": [
+        170,
+        216,
+        30,
         34
       ],
-      "area": 414,
-      "added_pixels": 414,
-      "removed_pixels": 0
+      "area": 818,
+      "added_pixels": 818,
+      "removed_pixels": 0,
+      "confidence": 0.5
     },
     {
       "type": "added",
       "bbox_xywh": [
-        119,
-        359,
-        26,
-        22
+        29,
+        218,
+        32,
+        35
       ],
-      "area": 326,
-      "added_pixels": 326,
-      "removed_pixels": 0
+      "area": 853,
+      "added_pixels": 853,
+      "removed_pixels": 0,
+      "confidence": 0.5
     },
     {
       "type": "added",
       "bbox_xywh": [
-        166,
-        363,
-        35,
+        122,
+        218,
+        28,
         21
       ],
-      "area": 383,
-      "added_pixels": 383,
-      "removed_pixels": 0
+      "area": 451,
+      "added_pixels": 451,
+      "removed_pixels": 0,
+      "confidence": 0.5
     },
     {
       "type": "added",
       "bbox_xywh": [
-        96,
-        380,
-        21,
-        23
-      ],
-      "area": 373,
-      "added_pixels": 373,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        96,
-        403,
-        56,
-        73
-      ],
-      "area": 1829,
-      "added_pixels": 1829,
-      "removed_pixels": 0
-    },
-    {
-      "type": "added",
-      "bbox_xywh": [
-        354,
-        409,
-        43,
-        34
-      ],
-      "area": 984,
-      "added_pixels": 984,
-      "removed_pixels": 0
-    },
-    {
-      "type": "removed",
-      "bbox_xywh": [
-        416,
-        448,
-        26,
-        33
-      ],
-      "area": 718,
-      "added_pixels": 0,
-      "removed_pixels": 718
-    },
-    {
-      "type": "removed",
-      "bbox_xywh": [
-        449,
-        470,
+        218,
+        220,
         29,
-        20
+        21
       ],
-      "area": 493,
-      "added_pixels": 0,
-      "removed_pixels": 493
+      "area": 479,
+      "added_pixels": 479,
+      "removed_pixels": 0,
+      "confidence": 0.5
     }
   ],
   "config": {
@@ -274,7 +319,9 @@
       "clahe_tile_grid_size": 8,
       "near_identity_reliability_enabled": true,
       "near_identity_min_inlier_matches": 6,
-      "near_identity_min_mae_improvement": 1.0
+      "near_identity_min_mae_improvement": 1.0,
+      "allow_small_image_unreliable_fallback": true,
+      "small_image_max_dim": 320
     },
     "segmentation": {
       "enabled": true,
@@ -283,9 +330,12 @@
       "local_files_only": false,
       "classes_of_interest": [
         "building",
-        "road"
+        "road",
+        "house",
+        "bridge",
+        "tower"
       ],
-      "confidence_threshold": 0.45
+      "confidence_threshold": 0.38
     },
     "change": {
       "pixel_diff_threshold": 30,
@@ -297,16 +347,20 @@
       "min_chroma_diff_threshold": 10.0,
       "max_chroma_diff_threshold": 30.0,
       "blur_kernel": 5,
-      "min_region_area": 300,
+      "min_region_area": 120,
       "intensity_margin": 8,
       "semantic_min_kept_fraction": 0.05,
       "use_registration_support_mask": true,
       "use_structural_edge_filter": true,
-      "structural_min_edge_fraction": 0.015,
+      "structural_min_edge_fraction": 0.01,
       "edge_dilate_kernel": 5,
       "unresolved_min_chroma_delta": 6.0,
+      "rescue_semantic_kept_max": 0.12,
+      "small_image_semantic_fallback_enabled": true,
+      "small_image_semantic_dilate_kernel": 3,
+      "small_image_semantic_min_region_area": 60,
       "allow_removed_without_semantic_transition": false,
-      "drop_sprawling_added_regions": true,
+      "drop_sprawling_added_regions": false,
       "sprawling_min_area": 6000,
       "sprawling_max_fill_ratio": 0.42
     },
@@ -320,5 +374,6 @@
     "summary_panel": "outputs\\results\\00_summary_panel.png",
     "overlay": "outputs\\results\\06_overlay.png",
     "regions": "outputs\\results\\07_regions.png"
-  }
+  },
+  "pair_unreliable": true
 }
